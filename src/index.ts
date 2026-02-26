@@ -1,7 +1,8 @@
-import { Elysia } from "elysia";
+import { Elysia } from 'elysia';
+import routes from './handler';
 
-const app = new Elysia().get("/", () => "Hello Elysia").listen(3000);
+export const app = new Elysia().use(routes);
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+app.listen(3000);
+
+console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
