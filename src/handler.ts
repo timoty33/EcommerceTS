@@ -1,12 +1,20 @@
+import { logger } from '@bogeychan/elysia-logger';
 import { Elysia, t } from 'elysia';
-import { logger } from './logger';
 
 const app = new Elysia();
 export default app;
 
-app.use(logger);
+// Middlewares
 
-app.get('/', () => 'Pong');
+app.use(
+  logger({
+    autoLogging: true
+  })
+);
+
+app.get('/', (ctx) => {
+  ctx.log.info(ctx, 'Context');
+});
 
 app.get(
   '/double/:number',
