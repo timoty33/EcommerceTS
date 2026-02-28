@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "devapi": "bun run --watch src/index.ts",
+    "devdb": "nohup bunx drizzle-kit studio > drizzle-studio.log 2>&1 &",
+    "dev": "bun run devdb && bun run devapi"
   },
   "dependencies": {
     "@elysiajs/openapi": "^1.4.14",

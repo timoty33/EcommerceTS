@@ -1,9 +1,0 @@
-GET http://localhost:3000/double/10
-
-###
-
-GET http://localhost:3000/double/timoty
-
-###
-
-GET localhost:3000/
