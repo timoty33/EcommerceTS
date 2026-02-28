@@ -7,13 +7,18 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "@bogeychan/elysia-logger": "^0.1.10",
-    "elysia": "latest"
+    "@elysiajs/openapi": "^1.4.14",
+    "dotenv": "^17.3.1",
+    "drizzle-orm": "^0.45.1",
+    "elysia": "latest",
+    "logestic": "^1.2.4",
+    "pg": "^8.19.0"
   },
   "devDependencies": {
     "@arthurfiorette/biomejs-config": "^2.0.1",
     "@biomejs/biome": "^2.4.4",
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "drizzle-kit": "^0.31.9"
   },
   "module": "src/index.js"
 }
