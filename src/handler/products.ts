@@ -1,10 +1,5 @@
 import { Elysia } from 'elysia';
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-};
+import type { Product } from '@/types/product';
 
 const items: Product[] = [
   { id: 1, name: 'Apple', price: 2 },
@@ -20,7 +15,7 @@ products.get(
   },
   {
     detail: {
-      summary: 'Get all products',
+      summary: 'Get all repository',
       tags: ['products']
     }
   }
