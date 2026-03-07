@@ -52,6 +52,46 @@ export async function findMany(name?: string, price?: number): Promise<Product[]
 
 // CREATE
 
+export async function create(name: string, priceReceived: number): Promise<Product> {
+  const price = String(priceReceived);
+  const [result] = await db.insert(productsTable).values({ name, price }).returning();
+
+  return {
+    ...result,
+    price: Number(result.price)
+  };
+}
+
 // UPDATE
 
+export async function update(
+  productToUpdate: Product,
+  productUpdated: { name: string; price: number }
+): Promise<Product> {
+  const [result] = await db
+    .update(productsTable)
+    .set({ name: productUpdated.name, price: String(productUpdated.price) })
+    .where(eq(productsTable.id, productToUpdate.id))
+    .returning();
+
+  if (!result) {
+    throw new Error('Product not found');
+  }
+
+  return {
+    ...result,
+    price: Number(result.price)
+  };
+}
+
 // DELETE
+
+export async function del(productToDelete: Product) {
+  const result = db
+    .delete(productsTable)
+    .where(eq(productsTable.id, productToDelete.id))
+    .returning();
+  if (!result) {
+    throw new Error('Product not found');
+  }
+}
