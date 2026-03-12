@@ -1,17 +1,13 @@
-import { Elysia } from 'elysia';
-import type { Product } from '@/types/product';
-
-const items: Product[] = [
-  { id: 1, name: 'Apple', price: 2 },
-  { id: 2, name: 'Orange', price: 1 }
-];
+import { Elysia, t } from 'elysia';
+import * as product from '@/database/repository/product';
+import type { ProductResponse } from '@/types/product';
 
 export const products = new Elysia({ prefix: 'products' });
 
 products.get(
   '/all',
   () => {
-    return items;
+    return product.selectAll();
   },
   {
     detail: {

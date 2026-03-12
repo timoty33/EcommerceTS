@@ -1,97 +1,111 @@
-import { eq, or } from 'drizzle-orm';
-import { productsTable } from '@/database/schemas/products';
-import type { Product } from '@/types/product';
+import {
+  productsStorageTable,
+  productsTable,
+  productsVariantsTable
+} from '@/database/schemas/products';
+import type {
+  ProductRequest,
+  ProductResponse,
+  ProductStorageRequest,
+  ProductStorageResponse,
+  ProductVariantRequest,
+  ProductVariantResponse
+} from '@/types/product';
 import { db } from '../db';
 
 // READ
 
-export async function selectAll(): Promise<Product[]> {
-  const result = await db.select().from(productsTable);
+export async function selectAll(): Promise<ProductResponse[]> {
+  const products = await db.select().from(productsTable);
+  const productsVariants = await db.select().from(productsVariantsTable);
+  const productStorage = await db.select().from(productsStorageTable);
 
-  return result.map((product) => ({
-    ...product,
-    price: Number(product.price)
-  }));
-}
+  return products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    description: product.description,
+    starsAverage: product.starsAverage,
 
-export async function findOne(id?: number, name?: string): Promise<Product | undefined> {
-  const result = await db.query.productsTable.findFirst({
-    where: or(
-      id ? eq(productsTable.id, id) : undefined,
-      name ? eq(productsTable.name, name) : undefined
-    )
-  });
+    variants: productsVariants
+      .filter((variant) => variant.productId === product.id)
+      .map((variant) => {
+        const storageData = productStorage.find((s) => s.variantId === variant.id);
 
-  if (!result) {
-    return undefined;
-  }
+        return {
+          id: variant.id,
+          productId: variant.productId,
+          price: variant.price,
+          isOnSale: variant.isOnSale,
+          salePrice: variant.salePrice,
+          color: variant.color,
+          sizes: variant.sizes,
+          tags: variant.tags,
+          sku: variant.sku,
 
-  return {
-    ...result,
-    price: Number(result.price)
-  };
-}
-
-export async function findMany(name?: string, price?: number): Promise<Product[] | undefined> {
-  const result = await db.query.productsTable.findMany({
-    where: or(
-      name ? eq(productsTable.name, name) : undefined,
-      price ? eq(productsTable.price, String(price)) : undefined
-    )
-  });
-
-  if (result.length === 0) {
-    return undefined;
-  }
-
-  return result.map((product) => ({
-    ...product,
-    price: Number(product.price)
+          storage: storageData
+            ? {
+                id: storageData.id,
+                variantId: storageData.variantId,
+                storage: storageData.storage,
+                sizesInStorage: storageData.sizesInStorage ?? []
+              }
+            : undefined // Se ele não existe da undefined
+        };
+      })
   }));
 }
 
 // CREATE
 
-export async function create(name: string, priceReceived: number): Promise<Product> {
-  const price = String(priceReceived);
-  const [result] = await db.insert(productsTable).values({ name, price }).returning();
+export async function createProduct(product: ProductRequest): Promise<ProductResponse> {
+  const [productInserted] = await db.insert(productsTable).values(product).returning();
+  return productInserted;
+}
 
-  return {
-    ...result,
-    price: Number(result.price)
-  };
+export async function createProductVariant(
+  variant: ProductVariantRequest
+): Promise<ProductVariantResponse> {
+  const [productVariant] = await db.insert(productsVariantsTable).values(variant).returning();
+  return productVariant;
+}
+
+export async function createProductVariantStorage(
+  storage: ProductStorageRequest
+): Promise<ProductStorageResponse> {
+  const [productVariantStorage] = await db.insert(productsStorageTable).values(storage).returning();
+  return productVariantStorage;
 }
 
 // UPDATE
-
-export async function update(
-  productToUpdate: Product,
-  productUpdated: { name: string; price: number }
-): Promise<Product> {
-  const [result] = await db
-    .update(productsTable)
-    .set({ name: productUpdated.name, price: String(productUpdated.price) })
-    .where(eq(productsTable.id, productToUpdate.id))
-    .returning();
-
-  if (!result) {
-    throw new Error('Product not found');
-  }
-
-  return {
-    ...result,
-    price: Number(result.price)
-  };
-}
-
-// DELETE
-
-export async function del(productToDelete: Product) {
-  const result = db
-    .delete(productsTable)
-    .where(eq(productsTable.id, productToDelete.id))
-    .returning();
-  if (!result) {
-    throw new Error('Product not found');
-  }
-}
+//
+// export async function update(
+//   productToUpdate: ProductResponse,
+//   productUpdated: { name: string; price: number }
+// ): Promise<ProductResponse> {
+//   const [result] = await db
+//     .update(productsTable)
+//     .set({ name: productUpdated.name, price: String(productUpdated.price) })
+//     .where(eq(productsTable.id, productToUpdate.id))
+//     .returning();
+//
+//   if (!result) {
+//     throw new Error('Product not found');
+//   }
+//
+//   return {
+//     ...result,
+//     price: Number(result.price)
+//   };
+// }
+//
+// // DELETE
+//
+// export async function del(productToDelete: ProductResponse) {
+//   const result = db
+//     .delete(productsTable)
+//     .where(eq(productsTable.id, productToDelete.id))
+//     .returning();
+//   if (!result) {
+//     throw new Error('Product not found');
+//   }
+// }
