@@ -3,7 +3,7 @@ import { boolean, integer, jsonb, numeric, pgTable, real, varchar } from 'drizzl
 export const productsTable = pgTable('products', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 200 }).notNull(),
-  description: varchar({ length: 200 }),
+  description: varchar(),
   starsAverage: real().notNull().default(4.5)
 });
 
@@ -27,5 +27,5 @@ export const productsStorageTable = pgTable('products_storage', {
     .notNull()
     .references(() => productsVariantsTable.id),
   storage: integer().notNull().default(0),
-  sizesInStorage: varchar({ length: 255 }).array()
+  size: varchar({ length: 255 }).notNull()
 });

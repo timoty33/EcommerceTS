@@ -1,6 +1,5 @@
 import { Elysia, t } from 'elysia';
 import * as product from '@/database/repository/product';
-import type { ProductResponse } from '@/types/product';
 
 export const products = new Elysia({ prefix: 'products' });
 
